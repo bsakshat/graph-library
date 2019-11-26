@@ -11,7 +11,7 @@ typedef struct graph_struct {
 } Graph;
 
 // Prototypes
-// ---------------------------------------------------
+// --------------------------------------------------
 
 // Initialization Functions
 Graph *graph_initialize();

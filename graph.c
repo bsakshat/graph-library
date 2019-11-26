@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "graph.h"
 
@@ -313,7 +314,7 @@ void graph_print(Graph *graph){
 	for (i = 0; i < graph->max_vertex; i++){
 		printf("    %d", i);
 	}
-	printf("\n-----------\n");
+	printf("\n------------\n");
 	for (i = 0; i < graph->max_vertex; i++){
 		printf("%d |", i);
 		for (j = 0; j < graph->max_vertex; j++){
@@ -347,12 +348,27 @@ int graph_load_file(Graph *graph, char *filename){
 		return -1;
 	}
 	FILE *fptr;
+	char line[FILE_ENTRY_MAX_LEN];
+	char pt[3] = {-1, -1, 0};
 	fptr = fopen(filename, "r");
 	if (fptr == NULL){
 		return -1;
+	}	
+	while (fgets(line, FILE_ENTRY_MAX_LEN, fptr) != NULL){
+		printf("%s\n", line);		//test
+		pt[0] = strtok(line, ",");
+		printf("%d\n", pt[0]);		//test
+		graph_add_vertex(graph, pt[0]);
+		if (pt != NULL){
+			pt[1] = strtok(NULL, ",");
+			pt[2] = strtok(NULL, ",");
+			if (graph_contains_vertex(graph, pt[1]) == 0){
+				graph_add_vertex(graph, pt[1]);
+			}
+			graph_add_edge(graph, pt[0], pt[1], pt[2]);
+		}
 	}
-	//need to implement load
-	
+	fclose(fptr);
 	return 0;
 }
 
