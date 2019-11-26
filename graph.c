@@ -339,7 +339,22 @@ void graph_output_dot(Graph *graph, char *filename){
 	if (fptr == NULL){
 		return;
 	}
-	//need to implement write
+	int i = 0;
+	int j = 0;
+	fprintf(fprintf, "digraph {\n");
+	for (i = 0; i < MAX_VERTICES; i++){
+		if (graph->adj_matrix[i][i] < 0){
+			continue;
+		}
+		fprintf(fptr, "%d;\n", i);
+		for (j = 0; j < MAX_VERTICES; j++){
+			if (graph->adj_matrix[i][j] > 0){
+				fprintf(fptr, "%d -> %d [label = %d];\n", i, j, graph->adj_matrix[i][j]);
+			}
+		}
+	}
+	fprintf(fptr, "}");
+	fclose(fptr);
 	return;
 }
 
@@ -349,25 +364,26 @@ int graph_load_file(Graph *graph, char *filename){
 	}
 	FILE *fptr;
 	char line[FILE_ENTRY_MAX_LEN];
-	char pt[3] = {-1, -1, 0};
+	char *pt[3];
 	fptr = fopen(filename, "r");
 	if (fptr == NULL){
 		return -1;
 	}	
-	while (fgets(line, FILE_ENTRY_MAX_LEN, fptr) != NULL){
-		printf("%s\n", line);		//test
-		pt[0] = strtok(line, ",");
-		printf("%d\n", pt[0]);		//test
-		graph_add_vertex(graph, pt[0]);
+	fgets(line, FILE_ENTRY_MAX_LEN, fptr);
+	printf("%s\n", line);		//test
+	pt[0] = strtok(line, ",");
+	printf("%d\n", *pt[0]);		//test
+	graph_add_vertex(graph, *pt[0]);
 		if (pt != NULL){
 			pt[1] = strtok(NULL, ",");
 			pt[2] = strtok(NULL, ",");
-			if (graph_contains_vertex(graph, pt[1]) == 0){
-				graph_add_vertex(graph, pt[1]);
+			if (graph_contains_vertex(graph, *pt[1]) == 0){
+				graph_add_vertex(graph, *pt[1]);
 			}
-			graph_add_edge(graph, pt[0], pt[1], pt[2]);
+
+			graph_add_edge(graph, *pt[0], *pt[1], *pt[2]);
 		}
-	}
+	
 	fclose(fptr);
 	return 0;
 }
