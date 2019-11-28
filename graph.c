@@ -29,7 +29,7 @@ Graph *graph_initialize(){
 		}
 	}
 	for (i = 0; i < MAX_VERTICES; i++){
-		new->visited[i] = -1;
+		new->visited[i] = 0;
 	}
 	return new;
 }
@@ -250,14 +250,11 @@ int *graph_get_predecessors(Graph *graph, int v1){
 	}
 	int i = 0;
 	int index = 0;
-	int *pred = malloc(sizeof(int) * MAX_VERTICES);
-	for (i = 0; i < MAX_VERTICES; i++){
+	int *pred = malloc(sizeof(int) * (graph->max_vertex + 1));
+	for (i = 0; i <= graph->max_vertex; i++){
 		pred[i] = -1;
 	}
-	for (i = 0; i < MAX_VERTICES; i++){
-		if (i == v1){
-			continue;
-		}
+	for (i = 0; i <= graph->max_vertex; i++){
 		if (graph->adj_matrix[i][v1] > 0){
 			pred[index] = i;
 			index++;
@@ -275,14 +272,11 @@ int *graph_get_successors(Graph *graph, int v1){
 	}
 	int i = 0;
 	int index = 0;
-	int *pred = malloc(sizeof(int) * MAX_VERTICES);
-	for (i = 0; i < MAX_VERTICES; i++){
+	int *pred = malloc(sizeof(int) * (graph->max_vertex + 1));
+	for (i = 0; i <= graph->max_vertex; i++){
 		pred[i] = -1;
 	}
-	for (i = 0; i < MAX_VERTICES; i++){
-		if (i == v1){
-			continue;
-		}
+	for (i = 0; i <= graph->max_vertex; i++){
 		if (graph->adj_matrix[v1][i] > 0){
 			pred[index] = i;
 			index++;
@@ -301,8 +295,27 @@ int graph_has_path(Graph *graph, int v1, int v2){
 	if (graph->adj_matrix[v1][v1] == -1 || graph->adj_matrix[v2][v2] == -1){
 		return 0;
 	}
-	//need to implement
+	if (v1 == v2){
+		return 1;
+	}
+	
+
 	return 0;
+}
+
+int bfs(Graph *graph, int v1, int v2){
+	int i = 0;
+	for (i = 0; i <= graph->max_vertex; i++){
+		
+	}
+		while (suc[i] != -1 && !graph->visited[v1]){
+		if (suc[i] = v2){
+			return 1;
+		}
+		i++;	
+	}	
+	graph->visited[v1] = 1;
+	bfs(graph, suc[i], v2);
 }
 
 void graph_print(Graph *graph){
@@ -311,13 +324,13 @@ void graph_print(Graph *graph){
 	}
 	int i = 0;
 	int j = 0;
-	for (i = 0; i < graph->max_vertex; i++){
+	for (i = 0; i <= graph->max_vertex; i++){
 		printf("    %d", i);
 	}
 	printf("\n------------\n");
-	for (i = 0; i < graph->max_vertex; i++){
+	for (i = 0; i <= graph->max_vertex; i++){
 		printf("%d |", i);
-		for (j = 0; j < graph->max_vertex; j++){
+		for (j = 0; j <= graph->max_vertex; j++){
 			if (graph->adj_matrix[i][j] == -1){
 				printf("    .");
 			}
@@ -341,7 +354,7 @@ void graph_output_dot(Graph *graph, char *filename){
 	}
 	int i = 0;
 	int j = 0;
-	fprintf(fprintf, "digraph {\n");
+	fprintf(fptr, "digraph {\n");
 	for (i = 0; i < MAX_VERTICES; i++){
 		if (graph->adj_matrix[i][i] < 0){
 			continue;
@@ -362,28 +375,33 @@ int graph_load_file(Graph *graph, char *filename){
 	if (graph == NULL){
 		return -1;
 	}
+	free(graph);
+	graph = graph_initialize();
 	FILE *fptr;
 	char line[FILE_ENTRY_MAX_LEN];
-	char *pt[3];
+	char *pt[3] = {NULL, NULL, NULL};
 	fptr = fopen(filename, "r");
 	if (fptr == NULL){
 		return -1;
 	}	
-	fgets(line, FILE_ENTRY_MAX_LEN, fptr);
-	printf("%s\n", line);		//test
-	pt[0] = strtok(line, ",");
-	printf("%d\n", *pt[0]);		//test
-	graph_add_vertex(graph, *pt[0]);
-		if (pt != NULL){
-			pt[1] = strtok(NULL, ",");
+	while (fgets(line, FILE_ENTRY_MAX_LEN, fptr) != NULL){
+		pt[0] = strtok(line, ",");
+		int v1 = 0;
+		sscanf(pt[0], "%d", &v1);
+		graph_add_vertex(graph, v1);
+		pt[1] = strtok(NULL, ",");
+		if (pt[1] != NULL){
+			int v2 = 0;
+			int wt = 0;
 			pt[2] = strtok(NULL, ",");
-			if (graph_contains_vertex(graph, *pt[1]) == 0){
-				graph_add_vertex(graph, *pt[1]);
+			sscanf(pt[1], "%d", &v2);					
+			sscanf(pt[2], "%d", &wt);
+			if (graph_contains_vertex(graph, v2) == 0){
+				graph_add_vertex(graph, v2);
 			}
-
-			graph_add_edge(graph, *pt[0], *pt[1], *pt[2]);
+			graph_add_edge(graph, v1, v2, wt);
 		}
-	
+	}
 	fclose(fptr);
 	return 0;
 }
@@ -403,10 +421,10 @@ int graph_save_file(Graph *graph, char *filename){
 		if (graph->adj_matrix[i][i] < 0){
 			continue;
 		}
-		fprintf(fptr, "%d", i);
+		fprintf(fptr, "%d\n", i);
 		for (j = 0; j < MAX_VERTICES; j++){
 			if (graph->adj_matrix[i][j] > 0){
-				fprintf(fptr, ",%d,%d\n", j, graph->adj_matrix[i][j]);
+				fprintf(fptr, "%d,%d,%d\n", i, j, graph->adj_matrix[i][j]);
 			}
 		}
 	}
