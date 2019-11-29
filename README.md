@@ -1,3 +1,4 @@
+# graph-library
 A graph library based on a adjacency matrix to manipulate a graph.
 - Add/check/remove a vertex
 - Add/check/remove an edge
