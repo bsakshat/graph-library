@@ -339,6 +339,7 @@ int dfs(Graph *graph, int v1, int v2){
  	while (suc[i] != -1){
  		//if the successor is v2
 		if (suc[i] == v2){
+			free(suc);
 			return 1;
 		}
 		//if the successor is already visited
@@ -351,12 +352,14 @@ int dfs(Graph *graph, int v1, int v2){
 			int r = dfs(graph, suc[i], v2);
 			//if v2 is found
 			if (r == 1){
+				free(suc);
 				return 1;
 			}
 			i++;
 		}	
 	}
 	//if v2 is not found
+	free(suc);
 	return 0;
 }
 
