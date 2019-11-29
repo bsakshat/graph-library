@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "graph.h"
 
@@ -49,5 +50,7 @@ int main(){
 	printf("Path from 0 to 6: %d\n", graph_has_path(gr, 0, 6));
 	printf("Path from 1 to 6: %d\n", graph_has_path(gr, 1, 6));
 	graph_print(gr);
+	free(suc);
+	free(gr);
 	return 0;
 }
