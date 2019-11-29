@@ -30,7 +30,7 @@ Graph *graph_initialize(){
 	}
 	for (i = 0; i < MAX_VERTICES; i++){
 		new->visited[i] = 0;
-	}
+	}	
 	return new;
 }
 
@@ -272,18 +272,43 @@ int *graph_get_successors(Graph *graph, int v1){
 	}
 	int i = 0;
 	int index = 0;
-	int *pred = malloc(sizeof(int) * (graph->max_vertex + 1));
+	int *suc = malloc(sizeof(int) * (graph->max_vertex + 1));
 	for (i = 0; i <= graph->max_vertex; i++){
-		pred[i] = -1;
+		suc[i] = -1;
 	}
 	for (i = 0; i <= graph->max_vertex; i++){
 		if (graph->adj_matrix[v1][i] > 0){
-			pred[index] = i;
+			suc[index] = i;
 			index++;
 		}
 	}
-	return pred;
+	return suc;
 }
+
+
+int dfs(Graph *graph, int v1, int v2){
+	int i = 0;
+	graph->visited[v1] = 1;
+	int *suc = graph_get_successors(graph, v1);
+ 	while (suc[i] != -1){
+		if (suc[i] == v2){
+			return 1;
+		}
+		else if(graph->visited[suc[i]]){
+			i++;
+			continue;
+		}
+		else{
+			int r = dfs(graph, suc[i], v2);
+			if (r == 1){
+				return 1;
+			}
+			i++;
+		}	
+	}	
+	return 0;
+}
+
 
 int graph_has_path(Graph *graph, int v1, int v2){
 	if (graph == NULL){
@@ -295,28 +320,21 @@ int graph_has_path(Graph *graph, int v1, int v2){
 	if (graph->adj_matrix[v1][v1] == -1 || graph->adj_matrix[v2][v2] == -1){
 		return 0;
 	}
-	if (v1 == v2){
+	if (v1 == v2 && graph->adj_matrix[v1][v1] > 0){
 		return 1;
 	}
-	
-
-	return 0;
-}
-
-int bfs(Graph *graph, int v1, int v2){
 	int i = 0;
-	for (i = 0; i <= graph->max_vertex; i++){
-		
-	}
-		while (suc[i] != -1 && !graph->visited[v1]){
-		if (suc[i] = v2){
-			return 1;
-		}
-		i++;	
+	for (i = 0; i < MAX_VERTICES; i++){
+		graph->visited[i] = 0;
 	}	
-	graph->visited[v1] = 1;
-	bfs(graph, suc[i], v2);
+	if (dfs(graph, v1, v2) == 1){
+		return 1;
+	}
+	else{
+		return 0;
+	}
 }
+
 
 void graph_print(Graph *graph){
 	if (graph == NULL){
